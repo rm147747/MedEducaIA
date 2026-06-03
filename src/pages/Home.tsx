@@ -1,10 +1,10 @@
-import { useState, useEffect, useRef, useCallback } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Link } from 'react-router-dom'
 import { motion, useInView, AnimatePresence } from 'framer-motion'
 import {
   Brain, Layers, BarChart3, Trophy, ChevronDown, ChevronUp,
   GraduationCap, Users, Stethoscope, Wallet, Star, Check, Play,
-  Sparkles, Flame, TrendingUp
+  TrendingUp
 } from 'lucide-react'
 import Layout from '../components/Layout'
 
