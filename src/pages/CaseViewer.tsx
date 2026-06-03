@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react'
-import { useParams } from 'react-router-dom'
+import { useParams, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   ClipboardList,
@@ -658,7 +658,39 @@ function ImagingTab({ imaging }: { imaging: CaseData['imaging'] }) {
       className="space-y-5"
     >
       <motion.div variants={staggerChild}>
-        <div className="bg-[#F0EDE6] rounded-[10px] aspect-video flex flex-col items-center justify-center border-2 border-dashed border-[#E8E4DA]">
+        <div className="bg-white rounded-[12px] border border-[#E8E4DA] p-6">
+        {/* Header */}
+        <div className="flex items-center gap-3 mb-5 pb-4 border-b border-[#E8E4DA]">
+          <div className="w-10 h-10 rounded-lg bg-[#E6F2F2] flex items-center justify-center">
+            <Scan size={20} className="text-[#0D7377]" />
+          </div>
+          <div>
+            <h3 className="font-heading text-base font-medium text-[#1C1917]">Laudo de Imagem</h3>
+            <p className="text-sm text-[#5C5852]">{imaging.type}</p>
+          </div>
+        </div>
+
+        {/* Content */}
+        <div className="space-y-4">
+          <div className="bg-[#F7F5F0] rounded-lg p-4 border border-[#E8E4DA]">
+            <p className="text-xs font-medium text-[#5C5852] uppercase tracking-wide mb-2">Descricao</p>
+            <p className="font-body text-[15px] text-[#1C1917] leading-relaxed">{imaging.description}</p>
+          </div>
+
+          <div className="bg-[#F0F7F7] rounded-lg p-4 border-l-4 border-[#0D7377]">
+            <p className="text-xs font-medium text-[#0D7377] uppercase tracking-wide mb-2">Interpretacao</p>
+            <p className="font-body text-[15px] text-[#1C1917] leading-relaxed">{imaging.interpretation}</p>
+          </div>
+
+          <div className="mt-4 p-3 bg-[#FDF3E3] rounded-lg border border-[#D4943A] flex items-start gap-2">
+            <AlertTriangle size={16} className="text-[#D4943A] mt-0.5 flex-shrink-0" />
+            <p className="text-sm text-[#B07A2E]">Laudo ilustrativo para fins educacionais. Imagens reais de exames serao disponibilizadas em breve.</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Original placeholder - kept for future image display */}
+      <div className="bg-[#F0EDE6] rounded-[10px] aspect-video flex flex-col items-center justify-center border-2 border-dashed border-[#E8E4DA]">
           <Scan size={40} className="text-[#9C9890] mb-3" />
           <span className="font-body text-[14px] text-[#9C9890]">
             Imagem do exame
@@ -1167,6 +1199,7 @@ const TABS = [
 ] as const
 
 export default function CaseViewer() {
+  const _navigate = useNavigate()
   const { id } = useParams<{ id: string }>()
   const currentCase = MOCK_CASES[id || ''] || MOCK_CASE
 
@@ -1238,7 +1271,7 @@ export default function CaseViewer() {
         <div className="max-w-[1100px] mx-auto px-4 sm:px-6 h-[60px] flex items-center justify-between">
           {/* Left: Logo + Breadcrumb */}
           <div className="flex items-center gap-3 min-w-0">
-            <button className="hidden sm:flex items-center gap-1.5 text-[#5C5852] hover:text-[#1C1917] transition-colors shrink-0">
+            <button className="hidden sm:flex items-center gap-1.5 text-[#5C5852] hover:text-[#1C1917] transition-colors shrink-0" onClick={() => _navigate("/specialties")}>
               <ArrowLeft size={16} />
               <span className="font-body text-[13px]">Voltar</span>
             </button>

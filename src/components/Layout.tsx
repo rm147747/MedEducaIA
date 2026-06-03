@@ -18,7 +18,7 @@ export default function Layout({ children }: LayoutProps) {
       className="min-h-[100dvh] flex flex-col"
     >
       <Navbar />
-      <main className="pb-20 md:pb-0" className="flex-1">
+      <main className="pb-20 md:pb-0 flex-1">
         {children}
       </main>
       <Footer />
