@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Menu, X } from 'lucide-react'
+import { Menu, X, LogOut, User } from 'lucide-react'
+import { useAuth } from '@/hooks/useAuth'
 
 const navLinks = [
   { label: 'Funcionalidades', href: '#funcionalidades' },
@@ -13,6 +14,7 @@ const navLinks = [
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
+  const { user, logout } = useAuth()
 
   useEffect(() => {
     const handleScroll = () => {
@@ -78,19 +80,43 @@ export default function Navbar() {
             ))}
           </div>
 
-          {/* Desktop CTA */}
+          {/* Desktop CTA / User */}
           <motion.div
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3, delay: 0.3 }}
             className="hidden md:block"
           >
-            <Link
-              to="/"
-              className="inline-flex items-center font-body font-medium text-[14px] bg-[#0D7377] text-white px-5 py-2.5 rounded-[10px] hover:bg-[#095C60] hover:scale-[1.02] hover:shadow-[0_4px_12px_rgba(13,115,119,0.25)] active:scale-[0.98] transition-all duration-200"
-            >
-              Comecar Gratis
-            </Link>
+            {user ? (
+              <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2 bg-white/80 rounded-full pl-1 pr-4 py-1 border border-[#E8E4DA]">
+                  <div className="w-8 h-8 rounded-full bg-[#E6F2F2] flex items-center justify-center">
+                    {user.photoURL ? (
+                      <img src={user.photoURL} alt="" className="w-8 h-8 rounded-full" />
+                    ) : (
+                      <User className="w-4 h-4 text-[#0D7377]" />
+                    )}
+                  </div>
+                  <span className="font-body text-sm text-[#1C1917] font-medium">
+                    {user.displayName || user.email?.split('@')[0] || 'Medico'}
+                  </span>
+                </div>
+                <button
+                  onClick={logout}
+                  className="p-2 text-[#9C9890] hover:text-[#C0392B] transition-colors"
+                  title="Sair"
+                >
+                  <LogOut className="w-5 h-5" />
+                </button>
+              </div>
+            ) : (
+              <Link
+                to="/register"
+                className="inline-flex items-center font-body font-medium text-[14px] bg-[#0D7377] text-white px-5 py-2.5 rounded-[10px] hover:bg-[#095C60] hover:scale-[1.02] hover:shadow-[0_4px_12px_rgba(13,115,119,0.25)] active:scale-[0.98] transition-all duration-200"
+              >
+                Comecar Gratis
+              </Link>
+            )}
           </motion.div>
 
           {/* Mobile Hamburger */}

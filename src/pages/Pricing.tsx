@@ -14,6 +14,7 @@ import {
   AccordionContent,
 } from '@/components/ui/accordion'
 import Layout from '../components/Layout'
+import { redirectToCheckout } from '@/lib/stripe'
 
 /* ------------------------------------------------------------------ */
 /*  Data                                                               */
@@ -292,7 +293,7 @@ export default function Pricing() {
                 </li>
               ))}
             </ul>
-            <button className="w-full mt-6 font-body font-medium text-[14px] bg-[#0D7377] text-white px-4 py-3 rounded-[10px] hover:bg-[#095C60] hover:shadow-[0_4px_12px_rgba(13,115,119,0.25)] active:scale-[0.98] transition-all duration-200">
+            <button onClick={() => redirectToCheckout('monthly')} className="w-full mt-6 font-body font-medium text-[14px] bg-[#0D7377] text-white px-4 py-3 rounded-[10px] hover:bg-[#095C60] hover:shadow-[0_4px_12px_rgba(13,115,119,0.25)] active:scale-[0.98] transition-all duration-200">
               Assinar Pro Mensal
             </button>
           </motion.div>
@@ -331,7 +332,7 @@ export default function Pricing() {
                 </li>
               ))}
             </ul>
-            <button className="w-full mt-6 font-body font-medium text-[14px] bg-[#D4943A] text-white px-4 py-3 rounded-[10px] hover:bg-[#B07A2E] hover:shadow-[0_4px_12px_rgba(212,148,58,0.25)] active:scale-[0.98] transition-all duration-200">
+            <button onClick={() => redirectToCheckout('annual')} className="w-full mt-6 font-body font-medium text-[14px] bg-[#D4943A] text-white px-4 py-3 rounded-[10px] hover:bg-[#B07A2E] hover:shadow-[0_4px_12px_rgba(212,148,58,0.25)] active:scale-[0.98] transition-all duration-200">
               Assinar Pro Anual
             </button>
           </motion.div>
