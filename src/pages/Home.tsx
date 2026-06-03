@@ -36,7 +36,7 @@ function Reveal({ children, delay = 0, className = '' }: { children: React.React
 }
 
 /* ─── Counter animation ─── */
-function AnimatedCounter({ target, prefix = '', suffix = '', duration = 2000, decimals = 0 }: { target: number; prefix?: string; suffix?: string; duration?: number; decimals?: number }) {
+function AnimatedCounter({ target, prefix = '', suffix = '', duration = 2000 }: { target: number; prefix?: string; suffix?: string; duration?: number }) {
   const [count, setCount] = useState(0)
   const { ref, inView } = useReveal()
   const hasAnimated = useRef(false)
@@ -49,13 +49,13 @@ function AnimatedCounter({ target, prefix = '', suffix = '', duration = 2000, de
       const elapsed = now - start
       const progress = Math.min(elapsed / duration, 1)
       const eased = 1 - Math.pow(1 - progress, 3)
-      setCount(Number((eased * target).toFixed(decimals)))
+      setCount(Math.floor(eased * target))
       if (progress < 1) requestAnimationFrame(step)
     }
     requestAnimationFrame(step)
   }, [inView, target, duration])
 
-  const formatted = count.toLocaleString('pt-BR', { minimumFractionDigits: decimals, maximumFractionDigits: decimals })
+  const formatted = count.toLocaleString('pt-BR')
   return <span ref={ref}>{prefix}{formatted}{suffix}</span>
 }
 
@@ -91,9 +91,9 @@ function HeroSection() {
   return (
     <section className="relative min-h-[90dvh] bg-[#F7F5F0] overflow-hidden">
       <FloatingCircles />
-      <div className="max-w-[1200px] mx-auto px-6 pt-[120px] pb-16 flex flex-col md:flex-row gap-8 md:gap-12 items-center">
+      <div className="max-w-[1200px] mx-auto px-6 pt-[120px] pb-16 grid grid-cols-1 lg:grid-cols-[55%_45%] gap-12 items-center">
         {/* Left — Content */}
-        <div className="relative z-10 order-2 md:order-1 w-full md:w-[55%]">
+        <div className="relative z-10">
           {/* Badge */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -149,7 +149,7 @@ function HeroSection() {
             className="flex flex-wrap gap-4 mb-10"
           >
             <Link
-              to="/specialties"
+              to="/"
               className="inline-flex items-center gap-2 font-body font-medium text-[16px] bg-[#0D7377] text-white px-7 py-[14px] rounded-[10px] hover:bg-[#095C60] hover:scale-[1.02] hover:shadow-[0_4px_12px_rgba(13,115,119,0.25)] active:scale-[0.98] transition-all duration-200"
             >
               Comecar Gratis
@@ -186,7 +186,7 @@ function HeroSection() {
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.8, delay: 0.6, ease: easeOut }}
-          className="relative flex items-center justify-center order-1 md:order-2 w-full md:w-[45%]"
+          className="relative flex items-center justify-center"
         >
           <motion.img
             src="/hero-illustration.png"
@@ -211,7 +211,7 @@ function StatsSection() {
     { icon: GraduationCap, value: 266507, suffix: '+', label: 'Estudantes de medicina no Brasil', color: '#0D7377' as const },
     { icon: Users, value: 87040, suffix: '', label: 'Candidatos ao ENARE em 2026', color: '#0D7377' as const, badge: '+63.7%' },
     { icon: Stethoscope, value: 3200, suffix: '+', label: 'Casos clinicos gerados por IA', color: '#0D7377' as const },
-    { icon: Wallet, value: 29.90, prefix: 'R$ ', suffix: '', label: 'Preco do plano Pro mensal', color: '#D4943A' as const, sublabel: 'ou R$ 19,90/mes no anual' },
+    { icon: Wallet, value: 2990, prefix: 'R$ ', suffix: '', label: 'Preco do plano Pro mensal', color: '#D4943A' as const, sublabel: 'ou R$ 19,90/mes no anual' },
   ]
 
   return (
@@ -236,7 +236,7 @@ function StatsSection() {
                 </div>
                 <div className="font-heading text-[36px] sm:text-[42px] font-bold mb-1" style={{ color: stat.color }}>
                   {stat.prefix && <span>{stat.prefix}</span>}
-                  <AnimatedCounter target={stat.value} duration={2000} decimals={stat.prefix === 'R$ ' ? 2 : 0} />
+                  <AnimatedCounter target={stat.value} duration={2000} />
                   {stat.suffix && <span className="text-[#D4943A]">{stat.suffix}</span>}
                   {stat.prefix === 'R$ ' && (
                     <span className="text-[16px] font-body font-normal text-[#5C5852] ml-1">/mes</span>
