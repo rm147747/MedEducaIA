@@ -36,7 +36,7 @@ function Reveal({ children, delay = 0, className = '' }: { children: React.React
 }
 
 /* ─── Counter animation ─── */
-function AnimatedCounter({ target, prefix = '', suffix = '', duration = 2000 }: { target: number; prefix?: string; suffix?: string; duration?: number }) {
+function AnimatedCounter({ target, prefix = '', suffix = '', duration = 2000, decimals = 0 }: { target: number; prefix?: string; suffix?: string; duration?: number; decimals?: number }) {
   const [count, setCount] = useState(0)
   const { ref, inView } = useReveal()
   const hasAnimated = useRef(false)
@@ -49,13 +49,13 @@ function AnimatedCounter({ target, prefix = '', suffix = '', duration = 2000 }: 
       const elapsed = now - start
       const progress = Math.min(elapsed / duration, 1)
       const eased = 1 - Math.pow(1 - progress, 3)
-      setCount(Math.floor(eased * target))
+      setCount(Number((eased * target).toFixed(decimals)))
       if (progress < 1) requestAnimationFrame(step)
     }
     requestAnimationFrame(step)
-  }, [inView, target, duration])
+  }, [inView, target, duration, decimals])
 
-  const formatted = count.toLocaleString('pt-BR')
+  const formatted = count.toLocaleString('pt-BR', { minimumFractionDigits: decimals, maximumFractionDigits: decimals })
   return <span ref={ref}>{prefix}{formatted}{suffix}</span>
 }
 
@@ -149,7 +149,7 @@ function HeroSection() {
             className="flex flex-wrap gap-4 mb-10"
           >
             <Link
-              to="/"
+              to="/specialties"
               className="inline-flex items-center gap-2 font-body font-medium text-[16px] bg-[#0D7377] text-white px-7 py-[14px] rounded-[10px] hover:bg-[#095C60] hover:scale-[1.02] hover:shadow-[0_4px_12px_rgba(13,115,119,0.25)] active:scale-[0.98] transition-all duration-200"
             >
               Comecar Gratis
@@ -211,7 +211,7 @@ function StatsSection() {
     { icon: GraduationCap, value: 266507, suffix: '+', label: 'Estudantes de medicina no Brasil', color: '#0D7377' as const },
     { icon: Users, value: 87040, suffix: '', label: 'Candidatos ao ENARE em 2026', color: '#0D7377' as const, badge: '+63.7%' },
     { icon: Stethoscope, value: 3200, suffix: '+', label: 'Casos clinicos gerados por IA', color: '#0D7377' as const },
-    { icon: Wallet, value: 2990, prefix: 'R$ ', suffix: '', label: 'Preco do plano Pro mensal', color: '#D4943A' as const, sublabel: 'ou R$ 19,90/mes no anual' },
+    { icon: Wallet, value: 29.90, prefix: 'R$ ', suffix: '', label: 'Preco do plano Pro mensal', color: '#D4943A' as const, sublabel: 'ou R$ 19,90/mes no anual' },
   ]
 
   return (
@@ -236,7 +236,7 @@ function StatsSection() {
                 </div>
                 <div className="font-heading text-[36px] sm:text-[42px] font-bold mb-1" style={{ color: stat.color }}>
                   {stat.prefix && <span>{stat.prefix}</span>}
-                  <AnimatedCounter target={stat.value} duration={2000} />
+                  <AnimatedCounter target={stat.value} duration={2000} decimals={stat.prefix === 'R$ ' ? 2 : 0} />
                   {stat.suffix && <span className="text-[#D4943A]">{stat.suffix}</span>}
                   {stat.prefix === 'R$ ' && (
                     <span className="text-[16px] font-body font-normal text-[#5C5852] ml-1">/mes</span>

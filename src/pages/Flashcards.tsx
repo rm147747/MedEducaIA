@@ -161,7 +161,7 @@ export default function Flashcards() {
 
   if (!currentCard) {
     return (
-      <div className="min-h-screen bg-[#F7F5F0] flex items-center justify-center">
+      <div className="min-h-screen bg-[#F7F5F0] pb-24 flex items-center justify-center">
         <div className="text-center">
           <p className="text-[#5C5852]">Nenhum flashcard disponivel</p>
         </div>
