@@ -142,7 +142,6 @@ export default function Specialties() {
 
   return (
     <Layout>
-      <div className="overflow-x-hidden">
       {/* Page Header */}
       <section className="bg-white border-b border-[#E8E4DA]">
         <div className="max-w-[1100px] mx-auto px-6 py-8">
@@ -327,7 +326,6 @@ export default function Specialties() {
           </motion.div>
         )}
       </section>
-      </div>
     </Layout>
   )
 }

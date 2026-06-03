@@ -4,10 +4,10 @@ import { Home, Stethoscope, Layers, BarChart3, User } from 'lucide-react'
 
 const navItems = [
   { icon: Home, label: 'Inicio', href: '/' },
-  { icon: Stethoscope, label: 'Casos', href: '/case/demo' },
+  { icon: Stethoscope, label: 'Casos', href: '/specialties' },
   { icon: Layers, label: 'Flashcards', href: '/flashcards' },
   { icon: BarChart3, label: 'Analytics', href: '/analytics' },
-  { icon: User, label: 'Perfil', href: '#' },
+  { icon: User, label: 'Perfil', href: '/' },
 ]
 
 export default function BottomNav() {

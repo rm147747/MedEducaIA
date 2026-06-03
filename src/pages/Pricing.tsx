@@ -148,7 +148,7 @@ export default function Pricing() {
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.1 }}
-            className="font-heading text-[42px] md:text-[42px] text-[28px] font-bold text-[#1C1917] mt-3 leading-tight"
+            className="font-heading text-[28px] md:text-[42px] font-bold text-[#1C1917] mt-3 leading-tight"
           >
             Invista na sua aprovação
           </motion.h1>

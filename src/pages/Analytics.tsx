@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useMemo } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { motion, useInView } from 'framer-motion'
 import {
   BarChart,
@@ -207,26 +207,25 @@ const tooltipLabelStyle = {
 /* ------------------------------------------------------------------ */
 
 export default function Analytics() {
+  const today = new Date()
+
   /* ---- generate 30-day streak data (mock) ---- */
-  const streakData = useMemo(() => {
-    const today = new Date()
-    const data: { date: Date; completed: boolean; isToday: boolean; intensity: 'high' | 'medium' | 'low' }[] = []
+  const generateStreakData = useCallback(() => {
+    const data: { date: Date; completed: boolean; isToday: boolean }[] = []
     for (let i = 29; i >= 0; i--) {
       const date = subDays(today, i)
-      // Deterministic completion pattern (75% completion rate)
-      const completed = (i % 4 !== 0) || i === 0
-      const intensity: 'high' | 'medium' | 'low' = completed
-        ? (i % 3 === 0) ? 'high' : (i % 2 === 0) ? 'medium' : 'low'
-        : 'low'
+      // Random completion pattern (weighted towards completion)
+      const completed = Math.random() > 0.25 || i === 0
       data.push({
         date,
         completed,
         isToday: i === 0,
-        intensity,
       })
     }
     return data
   }, [])
+
+  const [streakData] = useState(() => generateStreakData())
   const [chartInView, setChartInView] = useState(false)
   const chartRef = useRef<HTMLDivElement>(null)
 
@@ -476,12 +475,13 @@ export default function Analytics() {
                   {streakData.map((day, i) => {
                     const isToday = day.isToday
                     const dayNum = format(day.date, 'd')
-                    const intensityClass =
-                      day.intensity === 'high'
+                    const intensity = day.completed
+                      ? Math.random() > 0.6
                         ? 'bg-[#0D7377] text-white'
-                        : day.intensity === 'medium'
+                        : Math.random() > 0.5
                           ? 'bg-[#7BC4C6] text-white'
                           : 'bg-[#C8E6E7] text-[#0D7377]'
+                      : 'bg-[#F7F5F0] text-[#9C9890]'
 
                     return (
                       <motion.div
@@ -497,7 +497,7 @@ export default function Analytics() {
                           aspect-square rounded-[8px] flex items-center justify-center
                           font-body text-[11px] sm:text-[12px] font-medium
                           ${isToday ? 'ring-2 ring-[#D4943A] ring-offset-1 shadow-[0_0_8px_rgba(212,148,58,0.3)]' : ''}
-                          ${day.completed ? intensityClass : 'bg-[#F7F5F0] text-[#9C9890]'}
+                          ${day.completed ? intensity : 'bg-[#F7F5F0] text-[#9C9890]'}
                         `}
                         title={format(day.date, 'dd/MM/yyyy')}
                       >

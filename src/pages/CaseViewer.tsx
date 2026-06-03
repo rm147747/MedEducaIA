@@ -1,4 +1,5 @@
 import { useState, useCallback } from 'react'
+import { useParams } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   ClipboardList,
@@ -203,6 +204,216 @@ const MOCK_CASE: CaseData = {
         'A Diretriz SBC 2022 recomenda tempo door-to-balloon <= 90 minutos. Se o tempo de transporte para centro com hemodinamica for > 120 minutos, a trombolise farmacologica deve ser considerada (preferencialmente em ate 10 minutos do primeiro contato medico).',
     },
   ],
+}
+
+const MOCK_CASES: Record<string, CaseData> = {
+  'card-001': MOCK_CASE,
+  'cardio': MOCK_CASE,
+  'neuro': {
+    ...MOCK_CASE,
+    id: 'neuro',
+    specialty: 'Neurologia',
+    difficulty: 'Intermediario',
+    title: 'Cefaleia em paciente jovem',
+    patient: {
+      name: 'Ana Paula R.',
+      age: 24,
+      gender: 'Feminino',
+      occupation: 'Estudante',
+    },
+    presentation: {
+      chiefComplaint: 'Cefaleia pulsatile intensa ha 6 horas',
+      hpi: 'Paciente relata cefaleia frontal e temporal direita, pulsatile, intensidade 8/10, iniciada apos período de stress durante provas. Associada a fotofobia, fonofobia e nauseas. Negou trauma craniano previo.',
+      history: 'Migraine desde os 16 anos (1-2 episodios/mes). Uso de contraceptivo oral combinado ha 2 anos. Mae com historia de migraine.',
+      medications: 'Paracetamol 750mg em caso de dor, nao melhora completamente.',
+      familyHistory: 'Mae e irma com migraine com aura.',
+      allergies: 'Nega alergias medicamentosas',
+    },
+    physicalExam: {
+      vitals: [
+        { label: 'PA', value: '118/76 mmHg', abnormal: false },
+        { label: 'FC', value: '78 bpm', abnormal: false },
+        { label: 'FR', value: '16 irpm', abnormal: false },
+        { label: 'Temp', value: '36.5 C', abnormal: false },
+        { label: 'SpO2', value: '99% em ar ambiente', abnormal: false },
+        { label: 'Peso', value: '62 kg', abnormal: false },
+        { label: 'Altura', value: '1.65 m', abnormal: false },
+        { label: 'IMC', value: '22.8 kg/m2', abnormal: false },
+      ],
+      general: 'Lucida, orientada em tempo e espaco. Comunicativa, em moderado desconforto devido a dor.',
+      cardiovascular: 'Bulhas ritmicas em dois tempos, normofoneticas. Sem sopros.',
+      respiratory: 'Murmulhos vesiculares presentes bilateralmente. Sem ruidos adventicios.',
+      abdomen: 'Flacido, indolor. RHA presentes.',
+      extremities: 'Pulsos perifericos palpaveis e simetricos. Forca muscular preservada e simetrica em todos os grupos.',
+    },
+    labs: [
+      { name: 'Hemoglobina', value: '13.8 g/dL', ref: '12.0-16.0', abnormal: false },
+      { name: 'Leucocitos', value: '7.200/mm3', ref: '4.000-11.000', abnormal: false },
+      { name: 'Creatinina', value: '0.8 mg/dL', ref: '0.7-1.3', abnormal: false },
+      { name: 'Sodio', value: '140 mEq/L', ref: '135-145', abnormal: false },
+      { name: 'Potassio', value: '4.0 mEq/L', ref: '3.5-5.0', abnormal: false },
+      { name: 'Glicemia', value: '92 mg/dL', ref: '70-100', abnormal: false },
+      { name: 'TSH', value: '2.1 mIU/L', ref: '0.4-4.0', abnormal: false },
+    ],
+    imaging: {
+      type: 'Tomografia Computadorizada de Cranio',
+      description: 'TC de cranio sem contraste: sem alteracoes de densidade, sem sinais de hemorragia ou infarto agudo. Ventriculos de tamanho normal. Sulcos e cisternas preservados.',
+      interpretation: 'TC de cranio normal. Nao ha contraindicacao ao uso de triptanos. Considerar ressonancia magnetica em caso de mudanca de padrao da cefaleia.',
+    },
+    questions: [
+      {
+        id: 1,
+        text: 'Qual e o provavel diagnostico e conduta inicial mais adequada?',
+        options: [
+          { id: 'A', text: 'Cefaleia tensional; relaxantes musculares e fisioterapia' },
+          { id: 'B', text: 'Migraine sem aura; sumatriptano 50mg VO e repouso em ambiente escuro' },
+          { id: 'C', text: 'Meningite bacteriana; ceftriaxona + vancomicina e corticoides' },
+          { id: 'D', text: 'Hematoma subdural; neurocirurgia de urgencia' },
+        ],
+        correctAnswer: 'B',
+        explanation: 'A paciente apresenta cefaleia pulsatile intensa com fotofobia, fonofobia e nauseas, compatível com migraine sem aura (critérios ICHD-3). A TC normal exclui causa secundaria. Sumatriptano é primeira linha.',
+      },
+      {
+        id: 2,
+        text: 'Qual fator de risco modificavel para cronificacao da migraine esta presente?',
+        options: [
+          { id: 'A', text: 'Uso de contraceptivo oral combinado' },
+          { id: 'B', text: 'Idade inferior a 30 anos' },
+          { id: 'C', text: 'Historia familiar de migraine' },
+          { id: 'D', text: 'Sexo feminino' },
+        ],
+        correctAnswer: 'A',
+        explanation: 'O contraceptivo oral combinado pode exacerbar a migraine e aumentar o risco de AVE isquemico em mulheres com migraine com aura. Deve ser considerada a suspensao ou troca para metodo nao hormonal.',
+      },
+    ],
+  },
+  'emergencia': {
+    ...MOCK_CASE,
+    id: 'emergencia',
+    specialty: 'Emergência',
+    difficulty: 'Avancado',
+    title: 'Parada cardiorrespiratoria em UTI',
+    patient: {
+      name: 'Roberto S.',
+      age: 67,
+      gender: 'Masculino',
+      occupation: 'Aposentado',
+    },
+    presentation: {
+      chiefComplaint: 'PCR monitorada em UTI durante internacao para pneumonia',
+      hpi: 'Paciente internado para pneumonia aspirativa em uso de VM invasiva. Apresentou subita perda de pulsos, inicio de compressoes toracicas pelo enfermeiro. Monitor mostrou fibrilacao ventricular.',
+      history: 'DPOC ha 15 anos, HAS, DM2. Internacao previa ha 3 meses para descompensacao de ICC.',
+      medications: 'Norepinefrina 0.5 mcg/kg/min, Fentanil 2 mcg/kg/h, Midazolam 0.1 mg/kg/h, Meropenem 2g 8/8h.',
+      familyHistory: 'Pai com IAM aos 60 anos.',
+      allergies: 'Nega alergias medicamentosas',
+    },
+    physicalExam: {
+      vitals: [
+        { label: 'PA', value: 'INDET', abnormal: true },
+        { label: 'FC', value: 'Fibrilacao ventricular', abnormal: true },
+        { label: 'FR', value: 'Ventilacao mecanica', abnormal: true },
+        { label: 'Temp', value: '37.2 C', abnormal: false },
+        { label: 'SpO2', value: '85% pre-oxigenacao', abnormal: true },
+        { label: 'ETCO2', value: '18 mmHg', abnormal: true },
+        { label: 'Glasgow', value: '3 (E1V1M1)', abnormal: true },
+        { label: 'RC', value: '28 mm', abnormal: true },
+      ],
+      general: 'Paciente em PCR, sem pulsos palpaveis. Compressoes toracicas em andamento.',
+      cardiovascular: 'Bulhas ausentes. Pulso carotideo nao palpavel.',
+      respiratory: 'Ventilacao mecanica com FIO2 100%. Murmulhos vesiculares diminuidos bilateralmente.',
+      abdomen: 'Flacido, indolor.',
+      extremities: 'Extremidades frias, palidez cutanea. Pulsos ausentes.',
+    },
+    labs: [
+      { name: 'pH', value: '7.18', ref: '7.35-7.45', abnormal: true },
+      { name: 'pCO2', value: '52 mmHg', ref: '35-45', abnormal: true },
+      { name: 'pO2', value: '68 mmHg', ref: '80-100', abnormal: true },
+      { name: 'HCO3', value: '18 mEq/L', ref: '22-26', abnormal: true },
+      { name: 'Lactato', value: '4.2 mmol/L', ref: '<2.0', abnormal: true },
+      { name: 'Potassio', value: '3.2 mEq/L', ref: '3.5-5.0', abnormal: true },
+      { name: 'Creatinina', value: '1.4 mg/dL', ref: '0.7-1.3', abnormal: true },
+    ],
+    imaging: {
+      type: 'Monitor Cardiaco / Desfibrilador',
+      description: 'Ritmo inicial: Fibrilacao ventricular. Apos 1 choque (200J bifasico): Ritmo sinusal, FC 110 bpm.',
+      interpretation: 'PCR por FV revertida apos choque unico. ROSC obtido em 4 minutos desde o inicio da PCR.',
+    },
+    questions: [
+      {
+        id: 1,
+        text: 'Segundo o algoritmo de PCR adulto da AHA 2020, qual e a proxima conduta apos confirmar FV?',
+        options: [
+          { id: 'A', text: 'Administracao de adrenalina 1mg IV imediatamente' },
+          { id: 'B', text: 'Choque de 200J (bifasico) o mais rapido possivel' },
+          { id: 'C', text: 'Trombolise com tenecteplase 50mg IV' },
+          { id: 'D', text: 'Puncao pericardica imediata' },
+        ],
+        correctAnswer: 'B',
+        explanation: 'No algoritmo AHA 2020 para PCR adulto, ritmos desfibrilaveis (FV/VT sem pulso) devem receber choque imediato. Adrenalina vem apos o segundo choque.',
+      },
+    ],
+  },
+  'gastro': {
+    ...MOCK_CASE,
+    id: 'gastro',
+    specialty: 'Gastroenterologia',
+    difficulty: 'Iniciante',
+    title: 'Dor abdominal epigastrica recorrente',
+    patient: {
+      name: 'Maria Helena K.',
+      age: 45,
+      gender: 'Feminino',
+      occupation: 'Professora',
+    },
+    presentation: {
+      chiefComplaint: 'Dor epigastrica queimada ha 3 meses, piorando ha 1 semana',
+      hpi: 'Dor epigastrica em queimada, relacionada a alimentacao, melhora com antiacidos. Piora quando jejum por longos periodos. Sem vomitos, sem melena. Perda de peso de 2kg em 3 meses.',
+      history: 'Uso cronico de AINEs para dor lombar (ibuprofeno 600mg 3x/dia) ha 6 meses. Nao fumante.',
+      medications: 'Ibuprofeno 600mg 3x/dia, omeprazol 20mg 1x/dia (automedicao, irregular).',
+      familyHistory: 'Mae com cancer gastrico aos 70 anos.',
+      allergies: 'Nega alergias medicamentosas',
+    },
+    physicalExam: {
+      vitals: [
+        { label: 'PA', value: '128/82 mmHg', abnormal: false },
+        { label: 'FC', value: '76 bpm', abnormal: false },
+        { label: 'FR', value: '16 irpm', abnormal: false },
+        { label: 'Temp', value: '36.6 C', abnormal: false },
+        { label: 'SpO2', value: '98% em ar ambiente', abnormal: false },
+      ],
+      general: 'Lucida, orientada. Bem nutrida. Sem sinais de anemia.',
+      cardiovascular: 'Bulhas ritmicas em dois tempos, normofoneticas.',
+      respiratory: 'Murmulhos vesiculares presentes bilateralmente.',
+      abdomen: 'Plano, doloroso a palpacao profunda em epigastrio, sem defesa ou rebote. RHA presentes. Apendice de McBurney nao doloroso.',
+      extremities: 'Pulsos perifericos palpaveis. Sem edema.',
+    },
+    labs: [
+      { name: 'Hemoglobina', value: '12.8 g/dL', ref: '12.0-16.0', abnormal: false },
+      { name: 'Hematocrito', value: '38%', ref: '36-48', abnormal: false },
+      { name: 'Leucocitos', value: '8.100/mm3', ref: '4.000-11.000', abnormal: false },
+      { name: 'PCR', value: '3.2 mg/L', ref: '<5.0', abnormal: false },
+      { name: 'Creatinina', value: '0.9 mg/dL', ref: '0.7-1.3', abnormal: false },
+    ],
+    imaging: {
+      type: 'Endoscopia Digestiva Alta',
+      description: 'Lesao ulcerada em antro gastrico de aproximadamente 1.2cm, com fundo limpo, bordos regulares. Sem sinais de sangramento ativo. Biopsia realizada.',
+      interpretation: 'Ulceras gastricas requerem biopsia para exclusao de neoplasia (historia familiar de cancer gastrico). Provavel ulcera peptica associada a AINEs.',
+    },
+    questions: [
+      {
+        id: 1,
+        text: 'Qual e o manejo mais adequado para esta paciente?',
+        options: [
+          { id: 'A', text: 'Manter ibuprofeno e aumentar omeprazol para 40mg/dia' },
+          { id: 'B', text: 'Suspender AINEs, iniciar PPI em dose completa e teste de H. pylori' },
+          { id: 'C', text: 'Cirurgia gastrica de emergencia' },
+          { id: 'D', text: 'Quimioterapia neoadjuvante' },
+        ],
+        correctAnswer: 'B',
+        explanation: 'Paciente com ulcera peptica associada a AINEs. Conduta: suspender AINEs, PPI em dose completa (omeprazol 40mg/dia), teste de H. pylori. A biopsia e obrigatoria devido a historia familiar de cancer gastrico.',
+      },
+    ],
+  },
 }
 
 /* ------------------------------------------------------------------ */
@@ -956,6 +1167,9 @@ const TABS = [
 ] as const
 
 export default function CaseViewer() {
+  const { id } = useParams<{ id: string }>()
+  const currentCase = MOCK_CASES[id || ''] || MOCK_CASE
+
   const [activeTab, setActiveTab] = useState(0)
   const [selectedAnswers, setSelectedAnswers] = useState<Record<number, string>>(
     {},
@@ -979,7 +1193,7 @@ export default function CaseViewer() {
   const handleScore = useCallback(
     (points: number) => {
       setScore((prev) => prev + points)
-      const q = MOCK_CASE.questions[currentQIndex]
+      const q = currentCase.questions[currentQIndex]
       if (q) {
         setRevealedAnswers((prev) => ({ ...prev, [q.id]: true }))
         if (selectedAnswers[q.id] === q.correctAnswer) {
@@ -991,7 +1205,7 @@ export default function CaseViewer() {
   )
 
   const handleNext = useCallback(() => {
-    if (currentQIndex < MOCK_CASE.questions.length - 1) {
+    if (currentQIndex < currentCase.questions.length - 1) {
       setCurrentQIndex((prev) => prev + 1)
     } else {
       setCaseCompleted(true)
@@ -1008,7 +1222,7 @@ export default function CaseViewer() {
     setConfettiTrigger(0)
   }, [])
 
-  const correctCount = MOCK_CASE.questions.filter(
+  const correctCount = currentCase.questions.filter(
     (q) => selectedAnswers[q.id] === q.correctAnswer,
   ).length
 
@@ -1035,11 +1249,11 @@ export default function CaseViewer() {
               </span>
               <ChevronRight size={14} className="text-[#9C9890] shrink-0" />
               <span className="font-body text-[13px] text-[#5C5852] truncate">
-                {MOCK_CASE.specialty}
+                {currentCase.specialty}
               </span>
               <ChevronRight size={14} className="text-[#9C9890] shrink-0" />
               <span className="font-body text-[13px] text-[#5C5852] truncate max-w-[120px]">
-                {MOCK_CASE.title}
+                {currentCase.title}
               </span>
             </div>
           </div>
@@ -1081,24 +1295,24 @@ export default function CaseViewer() {
                   </div>
                   <div>
                     <h2 className="font-body font-semibold text-[16px] text-[#1C1917]">
-                      {MOCK_CASE.patient.name},{' '}
-                      <span className="font-normal">{MOCK_CASE.patient.age} anos</span>
+                      {currentCase.patient.name},{' '}
+                      <span className="font-normal">{currentCase.patient.age} anos</span>
                     </h2>
                     <p className="font-body text-[13px] text-[#5C5852]">
-                      {MOCK_CASE.patient.gender} &middot; {MOCK_CASE.patient.occupation}
+                      {currentCase.patient.gender} &middot; {currentCase.patient.occupation}
                     </p>
                   </div>
                 </div>
                 <div className="flex items-center gap-2 sm:ml-auto">
                   <span className="font-body text-[12px] font-medium bg-[#E6F2F2] text-[#0D7377] px-3 py-1 rounded-full">
-                    {MOCK_CASE.specialty}
+                    {currentCase.specialty}
                   </span>
                   <span className="font-body text-[12px] font-medium bg-[#FDF3E3] text-[#D4943A] px-3 py-1 rounded-full">
-                    {MOCK_CASE.difficulty}
+                    {currentCase.difficulty}
                   </span>
                   <span className="font-body text-[12px] text-[#5C5852] bg-white px-3 py-1 rounded-full border border-[#E8E4DA]">
-                    Questao {Math.min(currentQIndex + 1, MOCK_CASE.questions.length)} de{' '}
-                    {MOCK_CASE.questions.length}
+                    Questao {Math.min(currentQIndex + 1, currentCase.questions.length)} de{' '}
+                    {currentCase.questions.length}
                   </span>
                 </div>
               </div>
@@ -1154,18 +1368,18 @@ export default function CaseViewer() {
                     exit="exit"
                   >
                     {activeTab === 0 && (
-                      <PresentationTab data={MOCK_CASE.presentation} />
+                      <PresentationTab data={currentCase.presentation} />
                     )}
                     {activeTab === 1 && (
-                      <PhysicalExamTab data={MOCK_CASE.physicalExam} />
+                      <PhysicalExamTab data={currentCase.physicalExam} />
                     )}
-                    {activeTab === 2 && <LabsTab labs={MOCK_CASE.labs} />}
+                    {activeTab === 2 && <LabsTab labs={currentCase.labs} />}
                     {activeTab === 3 && (
-                      <ImagingTab imaging={MOCK_CASE.imaging} />
+                      <ImagingTab imaging={currentCase.imaging} />
                     )}
                     {activeTab === 4 && (
                       <QuestionsTab
-                        questions={MOCK_CASE.questions}
+                        questions={currentCase.questions}
                         selectedAnswers={selectedAnswers}
                         revealedAnswers={revealedAnswers}
                         onSelect={handleSelectAnswer}
@@ -1212,14 +1426,14 @@ export default function CaseViewer() {
                     className="font-heading text-[28px] font-bold"
                     style={{
                       color:
-                        correctCount / MOCK_CASE.questions.length >= 0.66
+                        correctCount / currentCase.questions.length >= 0.66
                           ? '#2D8A56'
-                          : correctCount / MOCK_CASE.questions.length >= 0.33
+                          : correctCount / currentCase.questions.length >= 0.33
                             ? '#D4943A'
                             : '#C0392B',
                     }}
                   >
-                    {correctCount}/{MOCK_CASE.questions.length}
+                    {correctCount}/{currentCase.questions.length}
                   </div>
                   <div className="flex items-center justify-center gap-2">
                     <Sparkles size={16} className="text-[#F5A623]" />
@@ -1238,7 +1452,7 @@ export default function CaseViewer() {
                 <>
                   <div className="flex items-center justify-between mb-4">
                     <span className="font-body text-[13px] text-[#5C5852]">
-                      Questao {currentQIndex + 1} de {MOCK_CASE.questions.length}
+                      Questao {currentQIndex + 1} de {currentCase.questions.length}
                     </span>
                     <div className="flex items-center gap-1.5 bg-[#FDF3E3] px-2.5 py-1 rounded-full">
                       <Sparkles size={12} className="text-[#D4943A]" />
@@ -1250,7 +1464,7 @@ export default function CaseViewer() {
 
                   {/* Mini progress dots */}
                   <div className="flex items-center gap-1.5 mb-5">
-                    {MOCK_CASE.questions.map((q, i) => {
+                    {currentCase.questions.map((q, i) => {
                       const isAnswered = !!revealedAnswers[q.id]
                       const isCorrect =
                         selectedAnswers[q.id] === q.correctAnswer
@@ -1273,16 +1487,16 @@ export default function CaseViewer() {
 
                   <div className="border-t border-[#E8E4DA] pt-4">
                     <QuestionCard
-                      question={MOCK_CASE.questions[currentQIndex]}
+                      question={currentCase.questions[currentQIndex]}
                       qIndex={currentQIndex}
-                      total={MOCK_CASE.questions.length}
+                      total={currentCase.questions.length}
                       selectedAnswer={
-                        selectedAnswers[MOCK_CASE.questions[currentQIndex]?.id] ??
+                        selectedAnswers[currentCase.questions[currentQIndex]?.id] ??
                         null
                       }
                       isRevealed={
                         !!revealedAnswers[
-                          MOCK_CASE.questions[currentQIndex]?.id
+                          currentCase.questions[currentQIndex]?.id
                         ]
                       }
                       onSelect={handleSelectAnswer}

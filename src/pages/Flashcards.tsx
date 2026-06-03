@@ -158,6 +158,16 @@ export default function Flashcards() {
 
   const currentCard = FLASHCARDS[currentIndex]
   const total = FLASHCARDS.length
+
+  if (!currentCard) {
+    return (
+      <div className="min-h-screen bg-[#F7F5F0] flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-[#5C5852]">Nenhum flashcard disponivel</p>
+        </div>
+      </div>
+    )
+  }
   const toReview = 5
   const mastered = 3
   const streak = 7
