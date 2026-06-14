@@ -45,6 +45,7 @@
     "date-fns": "^4.4.0",
     "embla-carousel-react": "^8.6.0",
     "firebase": "^12.14.0",
+    "firebase-admin": "^14.0.0",
     "framer-motion": "^12.40.0",
     "gsap": "^3.15.0",
     "input-otp": "^1.4.2",
@@ -60,6 +61,7 @@
     "react-router-dom": "^7.16.0",
     "recharts": "^2.15.4",
     "sonner": "^2.0.7",
+    "stripe": "^22.2.1",
     "tailwind-merge": "^3.4.0",
     "vaul": "^1.1.2",
     "zod": "^4.3.5"
@@ -69,6 +71,7 @@
     "@types/node": "^24.10.1",
     "@types/react": "^19.2.5",
     "@types/react-dom": "^19.2.3",
+    "@vercel/node": "^5.8.17",
     "@vitejs/plugin-react": "^5.1.1",
     "autoprefixer": "^10.4.23",
     "eslint": "^9.39.1",

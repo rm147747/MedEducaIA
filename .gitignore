@@ -1,3 +1,16 @@
 node_modules
 dist
 .DS_Store
+
+# Env / secrets — NUNCA commitar
+.env
+.env.*
+!.env.example
+*.local
+
+# Firebase Admin service account
+serviceAccount*.json
+firebase-adminsdk*.json
+
+# Vercel
+.vercel

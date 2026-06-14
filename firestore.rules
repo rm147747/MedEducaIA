@@ -1,0 +1,44 @@
+rules_version = '2';
+
+// Security Rules do Firestore para o MedEducaIA.
+// Princípio: o entitlement ('plan') é server-authoritative — o cliente NUNCA pode
+// se promover a 'pro'. Só o Admin SDK (webhook do Stripe) grava esses campos.
+// Publique com:  firebase deploy --only firestore:rules
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Campos de entitlement que SOMENTE o servidor pode escrever.
+    function entitlementKeys() {
+      return ['plan', 'subscriptionStatus', 'stripeCustomerId', 'stripeSubscriptionId', 'currentPeriodEnd'];
+    }
+
+    // Perfil + entitlement do usuário.
+    match /users/{userId} {
+      allow read: if request.auth != null && request.auth.uid == userId;
+
+      // Cliente pode criar/editar o próprio perfil, mas nunca tocar nos campos de entitlement.
+      allow create: if request.auth != null
+        && request.auth.uid == userId
+        && !request.resource.data.keys().hasAny(entitlementKeys());
+
+      allow update: if request.auth != null
+        && request.auth.uid == userId
+        && !request.resource.data.diff(resource.data).affectedKeys().hasAny(entitlementKeys());
+
+      allow delete: if false;
+    }
+
+    // Conteúdo premium (casos/flashcards quando migrarem do bundle para o Firestore).
+    // Leitura liberada apenas para assinantes 'pro'; escrita só via servidor.
+    match /premiumContent/{docId} {
+      allow read: if request.auth != null
+        && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.plan == 'pro';
+      allow write: if false;
+    }
+
+    // Negação por padrão para qualquer outra coleção.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

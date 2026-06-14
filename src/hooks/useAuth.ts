@@ -8,7 +8,8 @@ import {
   updateProfile,
   type User
 } from 'firebase/auth'
-import { auth, googleProvider } from '@/lib/firebase'
+import { doc, onSnapshot } from 'firebase/firestore'
+import { auth, googleProvider, db } from '@/lib/firebase'
 
 export interface AuthUser {
   uid: string
@@ -24,21 +25,46 @@ export function useAuth() {
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
-    const unsub = onAuthStateChanged(auth, (firebaseUser: User | null) => {
+    let unsubDoc: (() => void) | null = null
+
+    const unsubAuth = onAuthStateChanged(auth, (firebaseUser: User | null) => {
+      // Limpa o listener do doc anterior em qualquer mudança de auth.
+      if (unsubDoc) {
+        unsubDoc()
+        unsubDoc = null
+      }
+
       if (firebaseUser) {
+        // Estado inicial 'free' — o entitlement real é server-authoritative e chega
+        // pelo snapshot do doc users/{uid} (gravado só pelo webhook do Stripe).
         setUser({
           uid: firebaseUser.uid,
           email: firebaseUser.email,
           displayName: firebaseUser.displayName,
           photoURL: firebaseUser.photoURL,
-          plan: 'free'
+          plan: 'free',
         })
+
+        unsubDoc = onSnapshot(
+          doc(db, 'users', firebaseUser.uid),
+          (snap) => {
+            const plan = snap.data()?.plan === 'pro' ? 'pro' : 'free'
+            setUser((prev) => (prev ? { ...prev, plan } : prev))
+          },
+          () => {
+            // Falha de leitura (ex: rules) → mantém 'free' por segurança.
+          },
+        )
       } else {
         setUser(null)
       }
       setLoading(false)
     })
-    return unsub
+
+    return () => {
+      if (unsubDoc) unsubDoc()
+      unsubAuth()
+    }
   }, [])
 
   const login = useCallback(async (email: string, password: string) => {
