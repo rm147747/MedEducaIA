@@ -8,6 +8,7 @@ import Pricing from './pages/Pricing'
 import Login from './pages/Login'
 import Register from './pages/Register'
 import ProtectedRoute from './components/ProtectedRoute'
+import PremiumRoute from './components/PremiumRoute'
 
 export default function App() {
   return (
@@ -18,26 +19,28 @@ export default function App() {
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
 
-      {/* Protected routes - require login */}
-      <Route path="/case/:id" element={
-        <ProtectedRoute>
-          <CaseViewer />
-        </ProtectedRoute>
-      } />
+      {/* Free routes - require login only */}
       <Route path="/specialties" element={
         <ProtectedRoute>
           <Specialties />
         </ProtectedRoute>
       } />
+
+      {/* Pro routes - require active subscription */}
+      <Route path="/case/:id" element={
+        <PremiumRoute>
+          <CaseViewer />
+        </PremiumRoute>
+      } />
       <Route path="/flashcards" element={
-        <ProtectedRoute>
+        <PremiumRoute>
           <Flashcards />
-        </ProtectedRoute>
+        </PremiumRoute>
       } />
       <Route path="/analytics" element={
-        <ProtectedRoute>
+        <PremiumRoute>
           <Analytics />
-        </ProtectedRoute>
+        </PremiumRoute>
       } />
     </Routes>
   )
