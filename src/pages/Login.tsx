@@ -3,16 +3,31 @@ import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { Mail, Lock, LogIn, Chrome, AlertCircle } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
+import { loginSchema, firstError } from '@/lib/authSchemas'
 
 export default function Login() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [validationError, setValidationError] = useState<string | null>(null)
   const { login, loginGoogle, error, clearError, loading } = useAuth()
+
+  const shownError = validationError || error
+
+  const resetErrors = () => {
+    setValidationError(null)
+    clearError()
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!email || !password) return
-    await login(email, password)
+    const parsed = loginSchema.safeParse({ email, password })
+    const msg = firstError(parsed)
+    if (msg) {
+      setValidationError(msg)
+      return
+    }
+    setValidationError(null)
+    await login(parsed.data!.email, parsed.data!.password)
   }
 
   return (
@@ -38,14 +53,14 @@ export default function Login() {
           </h1>
 
           {/* Error */}
-          {error && (
+          {shownError && (
             <motion.div
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}
               className="mb-4 p-3 bg-[#FCEEEE] border border-[#C0392B] rounded-lg flex items-start gap-2"
             >
               <AlertCircle className="w-5 h-5 text-[#C0392B] flex-shrink-0 mt-0.5" />
-              <p className="text-sm text-[#C0392B]">{error}</p>
+              <p className="text-sm text-[#C0392B]">{shownError}</p>
             </motion.div>
           )}
 
@@ -58,7 +73,7 @@ export default function Login() {
                 <input
                   type="email"
                   value={email}
-                  onChange={(e) => { setEmail(e.target.value); clearError() }}
+                  onChange={(e) => { setEmail(e.target.value); resetErrors() }}
                   placeholder="seu@email.com"
                   className="w-full pl-11 pr-4 py-3 rounded-xl border border-[#E8E4DA] bg-[#F7F5F0] font-body text-[#1C1917] placeholder:text-[#9C9890] focus:outline-none focus:ring-2 focus:ring-[#0D7377] focus:border-transparent transition-all"
                   required
@@ -73,7 +88,7 @@ export default function Login() {
                 <input
                   type="password"
                   value={password}
-                  onChange={(e) => { setPassword(e.target.value); clearError() }}
+                  onChange={(e) => { setPassword(e.target.value); resetErrors() }}
                   placeholder="Sua senha"
                   className="w-full pl-11 pr-4 py-3 rounded-xl border border-[#E8E4DA] bg-[#F7F5F0] font-body text-[#1C1917] placeholder:text-[#9C9890] focus:outline-none focus:ring-2 focus:ring-[#0D7377] focus:border-transparent transition-all"
                   required

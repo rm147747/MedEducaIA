@@ -3,18 +3,33 @@ import { Link } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { Mail, Lock, User, Chrome, AlertCircle, CheckCircle } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
+import { registerSchema, firstError } from '@/lib/authSchemas'
 
 export default function Register() {
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [validationError, setValidationError] = useState<string | null>(null)
   const [step, setStep] = useState<'form' | 'success'>('form')
   const { register, loginGoogle, error, clearError, loading } = useAuth()
 
+  const shownError = validationError || error
+
+  const resetErrors = () => {
+    setValidationError(null)
+    clearError()
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!name || !email || !password) return
-    const ok = await register(name, email, password)
+    const parsed = registerSchema.safeParse({ name, email, password })
+    const msg = firstError(parsed)
+    if (msg) {
+      setValidationError(msg)
+      return
+    }
+    setValidationError(null)
+    const ok = await register(parsed.data!.name, parsed.data!.email, parsed.data!.password)
     if (ok) setStep('success')
   }
 
@@ -33,7 +48,9 @@ export default function Register() {
             Conta criada com sucesso!
           </h2>
           <p className="text-[#5C5852] font-body mb-6">
-            Bem-vindo, Dr(a). {name}! Sua conta esta pronta para comecar a estudar.
+            Bem-vindo, Dr(a). {name}! Enviamos um e-mail de confirmação para{' '}
+            <span className="font-semibold text-[#1C1917]">{email}</span> — confira sua caixa de
+            entrada. Você já pode começar a estudar.
           </p>
           <Link
             to="/specialties"
@@ -69,14 +86,14 @@ export default function Register() {
           </h1>
 
           {/* Error */}
-          {error && (
+          {shownError && (
             <motion.div
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}
               className="mb-4 p-3 bg-[#FCEEEE] border border-[#C0392B] rounded-lg flex items-start gap-2"
             >
               <AlertCircle className="w-5 h-5 text-[#C0392B] flex-shrink-0 mt-0.5" />
-              <p className="text-sm text-[#C0392B]">{error}</p>
+              <p className="text-sm text-[#C0392B]">{shownError}</p>
             </motion.div>
           )}
 
@@ -89,7 +106,7 @@ export default function Register() {
                 <input
                   type="text"
                   value={name}
-                  onChange={(e) => { setName(e.target.value); clearError() }}
+                  onChange={(e) => { setName(e.target.value); resetErrors() }}
                   placeholder="Dr. Seu Nome"
                   className="w-full pl-11 pr-4 py-3 rounded-xl border border-[#E8E4DA] bg-[#F7F5F0] font-body text-[#1C1917] placeholder:text-[#9C9890] focus:outline-none focus:ring-2 focus:ring-[#0D7377] focus:border-transparent transition-all"
                   required
@@ -104,7 +121,7 @@ export default function Register() {
                 <input
                   type="email"
                   value={email}
-                  onChange={(e) => { setEmail(e.target.value); clearError() }}
+                  onChange={(e) => { setEmail(e.target.value); resetErrors() }}
                   placeholder="seu@email.com"
                   className="w-full pl-11 pr-4 py-3 rounded-xl border border-[#E8E4DA] bg-[#F7F5F0] font-body text-[#1C1917] placeholder:text-[#9C9890] focus:outline-none focus:ring-2 focus:ring-[#0D7377] focus:border-transparent transition-all"
                   required
@@ -119,7 +136,7 @@ export default function Register() {
                 <input
                   type="password"
                   value={password}
-                  onChange={(e) => { setPassword(e.target.value); clearError() }}
+                  onChange={(e) => { setPassword(e.target.value); resetErrors() }}
                   placeholder="Minimo 6 caracteres"
                   className="w-full pl-11 pr-4 py-3 rounded-xl border border-[#E8E4DA] bg-[#F7F5F0] font-body text-[#1C1917] placeholder:text-[#9C9890] focus:outline-none focus:ring-2 focus:ring-[#0D7377] focus:border-transparent transition-all"
                   required
