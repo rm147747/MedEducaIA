@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { useState, useEffect } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { Mail, Lock, User, Chrome, AlertCircle, CheckCircle } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
@@ -11,7 +11,13 @@ export default function Register() {
   const [password, setPassword] = useState('')
   const [validationError, setValidationError] = useState<string | null>(null)
   const [step, setStep] = useState<'form' | 'success'>('form')
-  const { register, loginGoogle, error, clearError, loading } = useAuth()
+  const { register, loginGoogle, error, clearError, loading, user } = useAuth()
+  const navigate = useNavigate()
+
+  useEffect(() => {
+    // Google auth sets user without changing step — redirect immediately
+    if (user && step === 'form') navigate('/specialties', { replace: true })
+  }, [user, step, navigate])
 
   const shownError = validationError || error
 

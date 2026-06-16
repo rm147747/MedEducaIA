@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { useState, useEffect } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import { Mail, Lock, LogIn, Chrome, AlertCircle } from 'lucide-react'
 import { useAuth } from '@/hooks/useAuth'
@@ -9,7 +9,12 @@ export default function Login() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [validationError, setValidationError] = useState<string | null>(null)
-  const { login, loginGoogle, error, clearError, loading } = useAuth()
+  const { login, loginGoogle, error, clearError, loading, user } = useAuth()
+  const navigate = useNavigate()
+
+  useEffect(() => {
+    if (user) navigate('/specialties', { replace: true })
+  }, [user, navigate])
 
   const shownError = validationError || error
 
