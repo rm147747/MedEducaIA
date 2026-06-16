@@ -7,7 +7,11 @@ import { getFirestore } from 'firebase/firestore'
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
-  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  // Use o domínio de hospedagem como authDomain para evitar falha de comunicação
+  // cross-origin no signInWithPopup (popup em firebaseapp.com vs app em web.app).
+  authDomain: import.meta.env.VITE_FIREBASE_PROJECT_ID
+    ? `${import.meta.env.VITE_FIREBASE_PROJECT_ID}.web.app`
+    : import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
   projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
   storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
   messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,

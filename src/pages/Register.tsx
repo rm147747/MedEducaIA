@@ -174,7 +174,10 @@ export default function Register() {
 
           {/* Google */}
           <button
-            onClick={loginGoogle}
+            onClick={async () => {
+              const ok = await loginGoogle()
+              if (ok) navigate('/specialties', { replace: true })
+            }}
             disabled={loading}
             className="w-full py-3 rounded-xl border-2 border-[#E8E4DA] text-[#5C5852] font-body font-medium hover:border-[#0D7377] hover:text-[#0D7377] transition-all flex items-center justify-center gap-2 disabled:opacity-50"
           >
